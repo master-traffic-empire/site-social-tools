@@ -5,6 +5,7 @@ import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import siteConfig from '@/site.config';
 import Script from 'next/script';
+import { FacebookProvider } from '@/lib/facebook';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -18,7 +19,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: {
-    default: 'SocialKit — Free Social Media Tools for Creators',
+    default: 'SocialKit -- Free Social Media Tools for Creators',
     template: '%s | SocialKit',
   },
   description: siteConfig.description,
@@ -26,7 +27,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: 'website',
     siteName: siteConfig.name,
-    title: 'SocialKit — Free Social Media Tools for Creators',
+    title: 'SocialKit -- Free Social Media Tools for Creators',
     description: siteConfig.description,
   },
   twitter: {
@@ -63,9 +64,11 @@ export default function RootLayout({
         </Script>
       </head>
       <body style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
-        <Header />
-        <main style={{ flex: 1 }}>{children}</main>
-        <Footer />
+        <FacebookProvider>
+          <Header />
+          <main style={{ flex: 1 }}>{children}</main>
+          <Footer />
+        </FacebookProvider>
         <style>{`
           .tool-card:hover {
             border-color: var(--border-light);

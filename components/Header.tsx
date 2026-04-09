@@ -1,8 +1,9 @@
 'use client';
 
 import Link from 'next/link';
-import { Wrench, Menu, X } from 'lucide-react';
+import { Wrench, Menu, X, LogOut, Camera } from 'lucide-react';
 import { useState } from 'react';
+import { useFacebook } from '@/lib/facebook';
 
 const styles = {
   header: {
@@ -71,10 +72,55 @@ const styles = {
     padding: '12px 0',
     borderBottom: '1px solid var(--border)',
   },
+  userSection: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: 10,
+  },
+  avatar: {
+    width: 28,
+    height: 28,
+    borderRadius: '50%',
+    objectFit: 'cover' as const,
+    border: '1px solid var(--border)',
+  },
+  username: {
+    fontSize: 13,
+    fontWeight: 500,
+    color: 'var(--text-secondary)',
+  },
+  logoutBtn: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: 4,
+    padding: '4px 8px',
+    background: 'none',
+    border: '1px solid var(--border)',
+    borderRadius: 'var(--radius-sm)',
+    color: 'var(--text-muted)',
+    fontSize: 12,
+    cursor: 'pointer',
+    transition: 'all 0.2s',
+  },
+  connectBtn: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: 6,
+    padding: '6px 14px',
+    background: 'linear-gradient(135deg, #833AB4, #E1306C)',
+    border: 'none',
+    borderRadius: 'var(--radius-sm)',
+    color: 'white',
+    fontSize: 13,
+    fontWeight: 500,
+    cursor: 'pointer',
+    transition: 'all 0.2s',
+  },
 };
 
 export default function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
+  const { isLoggedIn, igAccount, login, logout, isSDKLoaded, isLoggingIn } = useFacebook();
 
   return (
     <header style={styles.header}>
@@ -86,6 +132,26 @@ export default function Header() {
         <nav style={styles.nav} className="desktop-nav">
           <Link href="/" style={styles.link}>Tools</Link>
           <Link href="/about" style={styles.link}>About</Link>
+          {isLoggedIn && igAccount ? (
+            <div style={styles.userSection}>
+              {igAccount.profilePictureUrl && (
+                <img src={igAccount.profilePictureUrl} alt={igAccount.username} style={styles.avatar} />
+              )}
+              <span style={styles.username}>@{igAccount.username}</span>
+              <button style={styles.logoutBtn} onClick={logout} title="Disconnect Instagram">
+                <LogOut size={12} />
+              </button>
+            </div>
+          ) : (
+            <button
+              style={styles.connectBtn}
+              onClick={login}
+              disabled={!isSDKLoaded || isLoggingIn}
+            >
+              <Camera size={14} />
+              {isLoggingIn ? 'Connecting...' : 'Connect IG'}
+            </button>
+          )}
         </nav>
         <button
           style={styles.menuBtn}
@@ -102,6 +168,26 @@ export default function Header() {
           <Link href="/about" style={styles.mobileLink} onClick={() => setMenuOpen(false)}>About</Link>
           <Link href="/privacy" style={styles.mobileLink} onClick={() => setMenuOpen(false)}>Privacy</Link>
           <Link href="/terms" style={styles.mobileLink} onClick={() => setMenuOpen(false)}>Terms</Link>
+          {isLoggedIn && igAccount ? (
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 0' }}>
+              {igAccount.profilePictureUrl && (
+                <img src={igAccount.profilePictureUrl} alt={igAccount.username} style={styles.avatar} />
+              )}
+              <span style={{ fontSize: 16, color: 'var(--text-primary)' }}>@{igAccount.username}</span>
+              <button style={{ ...styles.logoutBtn, fontSize: 14, padding: '6px 12px' }} onClick={() => { logout(); setMenuOpen(false); }}>
+                <LogOut size={14} /> Disconnect
+              </button>
+            </div>
+          ) : (
+            <button
+              style={{ ...styles.connectBtn, padding: '10px 20px', fontSize: 15 }}
+              onClick={() => { login(); setMenuOpen(false); }}
+              disabled={!isSDKLoaded || isLoggingIn}
+            >
+              <Camera size={16} />
+              {isLoggingIn ? 'Connecting...' : 'Connect Instagram'}
+            </button>
+          )}
         </nav>
       )}
       <style>{`
